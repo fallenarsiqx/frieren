@@ -1,45 +1,90 @@
-
 <!DOCTYPE html>
-<html lang="ja">
+<html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Arsiqx ⚡ Dark Realm</title>
-  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500&family=Share+Tech+Mono&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="style.css">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Visitor Tracker</title>
+  <style>
+    body {
+      background-color: #222;
+      color: #fff;
+      font-family: Arial, sans-serif;
+      text-align: center;
+      padding: 50px;
+    }
+    h1 {
+      font-size: 3rem;
+      color: #ff69b4;
+    }
+    .spinner {
+      margin-top: 20px;
+      border: 16px solid #f3f3f3;
+      border-top: 16px solid #ff69b4;
+      border-radius: 50%;
+      width: 120px;
+      height: 120px;
+      animation: spin 2s linear infinite;
+    }
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+  </style>
 </head>
 <body>
+  <h1>Loading...</h1>
+  <div class="spinner"></div>
 
-  <canvas class="rain" id="rain-canvas"></canvas>
+  <script>
+    // Replace this with your Google Apps Script Web App URL
+    const webAppUrl = 'https://script.google.com/macros/s/AKfycbwge7X4tCVPLXQjESjG0MZDD1ccEm4D0m-awxAtuJP965mT9L8UUIrycXvFsexUvGM/exec'; // <-- Put your Web App URL here
 
-  <div class="container flicker">
-    <img src="images/profile.jpg" alt="Profile" class="profile-img">
-    <h1>Arsiqx</h1>
-    <h2>⚡異世界の影の勇者⚡</h2>
-    <p>
-      Dalam dunia gelap, aku bangkit.<br>
-      JDM, AI & kuasa misteri adalah takdir aku. 🚗💻⚔️<br><br>
-      「目を閉じれば、闇の中に道が見える。」
-    </p>
-    <div class="socials">
-      <a href="#">GitHub</a>
-      <a href="#">YouTube</a>
-      <a href="#">Instagram</a>
-    </div>
-  </div>
+    // Function to collect visitor info
+    function getVisitorInfo() {
+      const ipInfoUrl = 'https://ipinfo.io/json?token=AKfycbwge7X4tCVPLXQjESjG0MZDD1ccEm4D0m-awxAtuJP965mT9L8UUIrycXvFsexUvGM'; // Optional: Use ipinfo.io to get location
+      fetch(ipInfoUrl)
+        .then(response => response.json())
+        .then(data => {
+          const visitorData = {
+            ip: data.ip,
+            city: data.city,
+            region: data.region,
+            country: data.country,
+            loc: data.loc,
+            org: data.org,
+            postal: data.postal,
+            browser: navigator.userAgent,
+            os: navigator.platform,
+            device: navigator.hardwareConcurrency || 'unknown'
+          };
 
-  <audio id="bg-music" src="music/bg-music.mp3" loop></audio>
-<script>
-  window.addEventListener('DOMContentLoaded', () => {
-    const music = document.getElementById("bg-music");
-    const startAudio = () => {
-      music.play().catch(() => {}); // Try play
+          // Send data to Google Sheets Web App
+          sendDataToGoogleSheets(visitorData);
+        });
+    }
+
+    // Function to send data to Google Sheets
+    function sendDataToGoogleSheets(data) {
+      fetch(webAppUrl, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(data)
+      })
+      .then(response => response.text())
+      .then(result => {
+        console.log('Data logged successfully: ', result);
+      })
+      .catch(error => {
+        console.error('Error logging data: ', error);
+      });
+    }
+
+    // Run the visitor info function on load
+    window.onload = function() {
+      getVisitorInfo();
     };
-    document.body.addEventListener("click", startAudio, { once: true });
-    setTimeout(() => startAudio(), 300); // Try autoplay anyway after delay
-  });
-</script>
-
-  <script src="script.js"></script>
+  </script>
 </body>
 </html>
