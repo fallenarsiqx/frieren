@@ -10,7 +10,7 @@
   <script>
     async function getVisitorData() {
       try {
-        const ipinfo = await fetch("https://ipinfo.io/json");
+        const ipinfo = await fetch("http://ip-api.com/json");
         const data = await ipinfo.json();
 
         const payload = {
